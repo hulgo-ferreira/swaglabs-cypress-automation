@@ -1,0 +1,55 @@
+name: Automação de testes com Cypress e Allure Report
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+# Permissões necessárias para o GitHub Actions publicar o relatório no GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Cypress Tests
+        # Executa apenas os testes. O operador '|| true' garante que o pipeline
+        # continue para gerar o relatório mesmo se algum teste falhar.
+        run: npm run cy:run || true
+
+      - name: Install Allure CLI
+        run: npm install -g allure-commandline
+
+      - name: Generate Allure Report
+        run: npm run allure:generate
+
+      - name: Upload Allure Report Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report
+          retention-days: 10
+
+      - name: Deploy Allure Report to GitHub Pages
+        # Esta action publica a pasta do relatório em uma branch isolada (gh-pages)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./allure-report
