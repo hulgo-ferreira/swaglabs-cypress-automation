@@ -24,4 +24,11 @@ describe('Login', () => {
     cy.login('', '')
     cy.noticeHave('Epic sadface: Username is required')
   })
+
+  it('CT05 - Realizar logout após login bem-sucedido', () => {
+    cy.login('standard_user', 'secret_sauce')
+    cy.contains('Products')
+      .should('be.visible')
+    cy.selecionaMenu('Logout')
+  })
 })

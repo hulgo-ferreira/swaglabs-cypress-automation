@@ -24,28 +24,53 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('goHome', () => {
-  cy.visit('/')
-  cy.contains('Swag Labs')
-    .should('be.visible')
-  
+Cypress.Commands.add("goHome", () => {
+  cy.visit("/");
+  cy.contains("Swag Labs").should("be.visible")
 })
 
-Cypress.Commands.add('login', (username, password) => {
-
-    if(username) {
-        cy.get('#user-name').type(username)        
-    }
-
-    if(password) {
-        cy.get('#password').type(password)       
-    }
-
-    cy.get('#login-button').click()
+Cypress.Commands.add("doLogin", () => {
+  cy.login('standard_user', 'secret_sauce')
 })
 
-Cypress.Commands.add('noticeHave', (text) => {
+Cypress.Commands.add("login", (username, password) => {
+  if (username) {
+    cy.get("#user-name").type(username)
+  }
+
+  if (password) {
+    cy.get("#password").type(password)
+  }
+
+  cy.get("#login-button").click();
+})
+
+Cypress.Commands.add("noticeHave", (text) => {
   cy.get('[data-test="error"]')
-    .should('be.visible')
-    .and('have.text', text)
+  .should("be.visible")
+  .and("have.text", text)
+})
+
+Cypress.Commands.add("selecionaMenu", (menu) => {
+  cy.get("#react-burger-menu-btn").click()
+  cy.contains(menu)
+    .should("be.visible")
+  cy.get("#logout_sidebar_link").click()
+})
+
+Cypress.Commands.add("selecionaProduto", (produto) => {
+  cy.get(`button[data-test="add-to-cart-${produto}"]`).click()
+  cy.contains("Remove").should("be.visible")
+})
+
+Cypress.Commands.add("removerProduto", (produto) => {
+  cy.get(`button[data-test="remove-${produto}"]`).click()
+  cy.contains("Add to cart").should("be.visible")
+})
+
+Cypress.Commands.add("ordenarProduto", (opcao, produto) => {
+  cy.get('.product_sort_container').select(opcao)
+  cy.get('.inventory_item_name')
+      .first()
+      .should('have.text', produto)
 })
